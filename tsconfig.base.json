@@ -1,0 +1,79 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "rootDir": ".",
+        "sourceMap": true,
+        "declaration": false,
+        "moduleResolution": "node",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "importHelpers": true,
+        "target": "es2015",
+        "module": "esnext",
+        "strict": true,
+        "lib": [
+            "es2017",
+            "dom"
+        ],
+        "skipLibCheck": true,
+        "skipDefaultLibCheck": true,
+        "baseUrl": ".",
+        "paths": {
+            "@buildhelios/proto-nodes": [
+                "packages/proto-nodes/src/index.ts"
+            ],
+            "@buildhelios/types": [
+                "packages/types/src/index.ts"
+            ],
+            "@buildhelios/domain-functions": [
+                "packages/domain-functions/src/index.ts"
+            ],
+            "@buildhelios/tables": [
+                "packages/tables/src/index.ts"
+            ],
+            "@buildhelios/components": [
+                "packages/components/src/index.ts"
+            ],
+            "@buildhelios/fns": [
+                "packages/fns/src/index.ts"
+            ],
+            "@buildhelios/fn-clients": [
+                "packages/fn-clients/src/index.ts"
+            ],
+            "@buildhelios/params": [
+                "packages/params/src/index.ts"
+            ],
+            "@buildhelios/frontend": [
+                "packages/frontend/src/index.ts"
+            ],
+            "@buildhelios/backend": [
+                "packages/backend/src/index.ts"
+            ],
+            "@buildhelios/callables": [
+                "packages/callables/src/index.ts"
+            ],
+            "@buildhelios/domain-actions": [
+                "packages/domain-actions/src/index.ts"
+            ],
+            "@buildhelios/client": [
+                "packages/client/src/index.ts"
+            ],
+            "@buildhelios/event-handler": [
+                "packages/event-handler/src/index.ts"
+            ],
+            "@buildhelios/sql-tables": [
+                "packages/sql-tables/src/index.ts"
+            ],
+            "@buildhelios/sql-migrations": [
+                "packages/sql-migrations/src/index.ts"
+            ],
+            "@buildhelios/common": [
+                "packages/common/src/index.ts"
+            ]
+        }
+    },
+    "exclude": [
+        "node_modules",
+        "tmp"
+    ]
+}
