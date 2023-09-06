@@ -1,0 +1,10 @@
+{
+    "name": "@buildhelios/types",
+    "version": "0.0.3",
+    "type": "commonjs",
+    "repository":{
+        "type":"git",
+        "url":"https://github.com/buildhelios/helios-sdk/packages/types"
+    },
+    "license":"Apache-2.0"
+}
