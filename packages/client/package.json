@@ -1,10 +1,12 @@
 {
     "name": "@buildhelios/client",
-    "version": "0.0.3",
+    "version": "0.0.7",
     "type": "commonjs",
     "repository":{
         "type":"git",
-        "url":"https://github.com/buildhelios/helios-sdk/packages/client"
+        "url":"https://github.com/buildhelios/helios-sdk.git",
+        "directory": "packages/client"
     },
+    "homepage": "https://github.com/buildhelios/helios-sdk/tree/main/packages/client",
     "license":"Apache-2.0"
 }

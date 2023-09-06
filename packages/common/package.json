@@ -1,10 +1,12 @@
 {
     "name": "@buildhelios/common",
-    "version": "0.0.3",
+    "version": "0.0.7",
     "type": "commonjs",
     "repository":{
         "type":"git",
-        "url":"https://github.com/buildhelios/helios-sdk/packages/common"
+        "url":"https://github.com/buildhelios/helios-sdk.git",
+        "directory": "packages/common"
     },
+    "homepage": "https://github.com/buildhelios/helios-sdk/tree/main/packages/common",
     "license":"Apache-2.0"
 }
