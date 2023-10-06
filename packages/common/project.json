@@ -1,5 +1,5 @@
 {
-    "name": "common",
+    "name": "helios-common",
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "sourceRoot": "packages/common/src",
     "projectType": "library",

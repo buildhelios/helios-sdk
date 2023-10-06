@@ -2,6 +2,7 @@
     "name": "@buildhelios/client",
     "version": "0.0.7",
     "type": "commonjs",
+    "main":"src/lib/client.ts",
     "repository":{
         "type":"git",
         "url":"https://github.com/buildhelios/helios-sdk.git",

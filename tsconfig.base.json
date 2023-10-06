@@ -34,6 +34,9 @@
             "@buildhelios/components": [
                 "packages/components/src/index.ts"
             ],
+            "@buildhelios/hubble": [
+                "packages/hubble/src/index.ts"
+            ],
             "@buildhelios/fns": [
                 "packages/fns/src/index.ts"
             ],
@@ -69,6 +72,96 @@
             ],
             "@buildhelios/common": [
                 "packages/common/src/index.ts"
+            ],
+            "@iyio/aws": [
+                "packages/aws/src/index.ts"
+            ],
+            "@iyio/aws-secrets": [
+                "packages/aws-secrets/src/index.ts"
+            ],
+            "@iyio/aws-credential-providers": [
+                "packages/aws-credential-providers/src/index.ts"
+            ],
+            "@iyio/aws-dynamo": [
+                "packages/aws-dynamo/src/index.ts"
+            ],
+            "@iyio/aws-lambda": [
+                "packages/aws-lambda/src/index.ts"
+            ],
+            "@iyio/aws-rds": [
+                "packages/aws-rds/src/index.ts"
+            ],
+            "@iyio/aws-s3": [
+                "packages/aws-s3/src/index.ts"
+            ],
+            "@iyio/aws-tests": [
+                "packages/aws-tests/src/index.ts"
+            ],
+            "@iyio/browser-mocks": [
+                "packages/browser-mocks/src/index.ts"
+            ],
+            "@iyio/cdk-common": [
+                "packages/cdk-common/src/index.ts"
+            ],
+            "@iyio/common": [
+                "packages/iyio-common/src/index.ts"
+            ],
+            "@iyio/nextjs-common": [
+                "packages/nextjs-common/src/index.ts"
+            ],
+            "@iyio/node-common": [
+                "packages/node-common/src/index.ts"
+            ],
+            "@iyio/nx-common": [
+                "packages/nx-common/src/index.ts"
+            ],
+            "@iyio/protogen": [
+                "packages/protogen/src/index.ts"
+            ],
+            "@iyio/protogen-runtime": [
+                "packages/protogen-runtime/src/index.ts"
+            ],
+            "@iyio/protogen-sql": [
+                "packages/protogen-sql/src/index.ts"
+            ],
+            "@iyio/react-common": [
+                "packages/react-common/src/index.ts"
+            ],
+            "@iyio/svg-charts": [
+                "packages/svg-charts/src/index.ts"
+            ],
+            "@iyio/svg-charts-react": [
+                "packages/svg-charts-react/src/index.ts"
+            ],
+            "@iyio/tmpl-gen": [
+                "packages/tmpl-gen/src/index.ts"
+            ],
+            "@iyio/ai-complete": [
+                "packages/ai-complete/src/index.ts"
+            ],
+            "@iyio/ai-complete-openai": [
+                "packages/ai-complete-openai/src/index.ts"
+            ],
+            "@iyio/ai-complete-lambda": [
+                "packages/ai-complete-lambda/src/index.ts"
+            ],
+            "@iyio/ai-complete-openai-cdk": [
+                "packages/ai-complete-openai-cdk/src/index.ts"
+            ],
+            "@iyio/media-common": [
+                "packages/media-common/src/index.ts"
+            ],
+            "@iyio/obj-sync": [
+                "packages/obj-sync/src/index.ts"
+            ],
+            "@iyio/obj-sync-cdk": [
+                "packages/obj-sync-cdk/src/index.ts"
+            ],
+            "@iyio/rtxt": [
+                "packages/rtxt/src/index.ts"
+            ],
+            "@iyio/iyio-util-fns": [
+                "packages/iyio-util-fns/src/index.ts"
             ]
         }
     },

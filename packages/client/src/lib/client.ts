@@ -24,6 +24,10 @@ export const initHeliosClient=(config?:HeliosClientConfig)=>{
 
     setConfig(_config);
 
+    if(globalThis.window){
+        console.info('initHeliosClient',_config);
+    }
+
     initListeners();
 
     listenToVisibilityChange();

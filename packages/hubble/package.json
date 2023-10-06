@@ -1,0 +1,13 @@
+{
+    "name": "@buildhelios/hubble",
+    "version": "0.0.7",
+    "type": "commonjs",
+    "main":"src/lib/hubble.ts",
+    "repository":{
+        "type":"git",
+        "url":"https://github.com/buildhelios/helios-sdk.git",
+        "directory": "packages/hubble"
+    },
+    "homepage": "https://github.com/buildhelios/helios-sdk/tree/main/packages/hubble",
+    "license":"Apache-2.0"
+}

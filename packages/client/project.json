@@ -11,6 +11,17 @@
                 "outputPath": "dist/packages/client",
                 "main": "packages/client/src/index.ts",
                 "tsConfig": "packages/client/tsconfig.lib.json",
+                "assets": ["packages/client/*.md"],
+                "enableAmd": false
+            }
+        },
+        "build-standalone": {
+            "executor": "@nrwl/js:tsc",
+            "outputs": ["{options.outputPath}"],
+            "options": {
+                "outputPath": "dist/packages/client",
+                "main": "packages/client/src/index.ts",
+                "tsConfig": "packages/client/tsconfig.lib.json",
                 "assets": ["packages/client/*.md"]
             }
         },
