@@ -1,3 +1,4 @@
+
 export const aryRemoveItem=<T>(ary:T[],item:T):boolean=>
 {
     if(!ary){
@@ -46,3 +47,5 @@ export const delayAsync=(delayMs:number):Promise<void>=>
 export const escapeRegExp=(text:string):string=>{
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g,'\\$&');
 }
+
+export const eventProxyUrlParam='__evt_proxy_data__'

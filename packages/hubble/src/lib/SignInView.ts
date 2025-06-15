@@ -1,14 +1,13 @@
+import { signInHeliosClient } from "@buildhelios/client";
 import { isValidEmail } from "@iyio/common";
 import { Button } from "./Button";
 import { Form } from "./Form";
 import { Head } from "./Head";
-import { Hubble } from "./Hubble";
 import { TextInput } from "./TextInput";
 import { UiView } from "./UiView";
+import { Hubble } from "./hubble";
 import { hsComps } from "./hubble-comps";
 import { colStyle } from "./hubble-style";
-
-const tmpPassword='impact123'
 
 export class SignInView extends UiView
 {
@@ -24,6 +23,32 @@ export class SignInView extends UiView
         let emailInput:TextInput|null=null;
         let passwordInput:TextInput|null=null;
 
+        let busy=false;
+
+        const signIn=async ()=>{
+            if(busy){
+                return;
+            }
+            busy=true;
+            this.elem.style.opacity='0.5';
+            try{
+
+                await signInHeliosClient(email,password);
+                await hubble.loadTargetsAsync();
+                hubble.menu.mode={type:'main-menu'}
+                if(emailInput){
+                    emailInput.value='';
+                }
+                if(passwordInput){
+                    passwordInput.value='';
+                }
+
+            }finally{
+                this.elem.style.opacity='1';
+                busy=false;
+            }
+        }
+
         super({
             style:colStyle,
             children:[
@@ -32,15 +57,7 @@ export class SignInView extends UiView
 
                 new Form({
                     onSubmit:()=>{
-                        if(password===tmpPassword){
-                            hubble.menu.mode={type:'main-menu'}
-                        }
-                        if(emailInput){
-                            emailInput.value='';
-                        }
-                        if(passwordInput){
-                            passwordInput.value='';
-                        }
+                        signIn();
                     },
                     children:[
                         emailInput=new TextInput({

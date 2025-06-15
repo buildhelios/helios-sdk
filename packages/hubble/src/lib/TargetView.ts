@@ -1,10 +1,10 @@
 import { Button } from "./Button";
 import { Head } from "./Head";
-import { Hubble } from "./Hubble";
 import { PanelButton } from "./PanelButton";
 import { SelectInput } from "./SelectInput";
 import { TextInput } from "./TextInput";
 import { UiView } from "./UiView";
+import { Hubble } from "./hubble";
 import { hsComps } from "./hubble-comps";
 import { colStyle, hs } from "./hubble-style";
 import { HubbleTarget, createHubbleTarget } from "./hubble-types";
@@ -102,7 +102,7 @@ export class TargetView extends UiView
                                 marginRight:'auto'
                             },
                             onClick:()=>{
-                                hubble.deleteTarget(this.target.id);
+                                hubble.deleteTargetAsync(this.target.id);
                                 hubble.currentTarget=null;
                                 hubble.menu.mode={type:'main-menu'};
                             }
@@ -119,7 +119,7 @@ export class TargetView extends UiView
                             text:'Save',
                             type:'primary',
                             onClick:()=>{
-                                hubble.saveTarget(this.target);
+                                hubble.saveTargetAsync(this.target);
                                 hubble.currentTarget=null;
                                 hubble.menu.mode={type:'main-menu'};
 

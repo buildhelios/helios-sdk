@@ -22,7 +22,8 @@ export const sendAsync=async <TResult=any,TBody=any>(
     endpoint:string,
     method:string,
     body?:TBody,
-    ignoreResult?:boolean
+    ignoreResult?:boolean,
+    token?:string
 ):Promise<TResult|undefined>=>{
 
     endpoint=formatEndpoint(config,endpoint);
@@ -48,7 +49,10 @@ export const sendAsync=async <TResult=any,TBody=any>(
 
             const r=await globalThis.fetch?.(endpoint,{
                 method,
-                body:sendBody
+                body:sendBody,
+                headers:token?{
+                    ['x-helios-client-token']:token,
+                }:undefined
             })
 
             if(!r){

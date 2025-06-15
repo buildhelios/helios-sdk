@@ -1,12 +1,18 @@
-import { WithoutId, aryRemoveAll, aryRemoveItem, delayAsync, enableConsoleListening, ignoreConsoleListeners } from '@buildhelios/common';
-import { CommonEventTypesMap, EventRecord } from '@buildhelios/types';
+import { WithoutId, aryRemoveAll, aryRemoveItem, delayAsync, enableConsoleListening, eventProxyUrlParam, ignoreConsoleListeners } from '@buildhelios/common';
+import { CommonEventTypesMap, EventRecord, EventUrlProxyRequest, LocationInfo, ProfileLookup, ProfileResolveRequest, ProfileStatus, UtmParams } from '@buildhelios/types';
+import { PromiseSource, objectToQueryParams, queryParamsToObject, shortUuid } from '@iyio/common';
 import { captureConsole } from './captureConsole';
-import { HeliosClientConfig, UiEventTarget, defaultHeliosClientConfig } from "./client-types";
+import { ClientSignInToken, HeliosClientConfig, HeliosEvtFn, OptionalEventRecord, UiEventTarget, defaultHeliosClientConfig } from "./client-types";
+import { registerCustomComponents } from './comp-reg';
 import { getConfig, requireConfig, setConfig } from './config';
+import { FormMgr } from './forms/FormMgr';
 import { minifyEventRecords } from './minify';
 import { sendAsync } from './sendAsync';
 import { isTargetMatch } from './target';
 
+let utmParams:UtmParams|undefined=undefined;
+const utmParamsKey='utmParams';
+const profileLookupKey='profileLookupInfo';
 
 /**
  * Initializes the HELIOS client
@@ -28,6 +34,10 @@ export const initHeliosClient=(config?:HeliosClientConfig)=>{
         console.info('initHeliosClient',_config);
     }
 
+    loadUtmParams();
+
+    getHeliosClientLocationInfoAsync();
+
     initListeners();
 
     listenToVisibilityChange();
@@ -43,6 +53,165 @@ export const initHeliosClient=(config?:HeliosClientConfig)=>{
     }
 
     addEventTarget(_config.targets);
+
+    registerCustomComponents();
+
+    setupGlobalHeliosFn();
+
+    new FormMgr().initAsync();
+}
+
+const setupGlobalHeliosFn=()=>{
+    if(!globalThis.window){
+        return;
+    }
+    let heliosFn:HeliosEvtFn|undefined=(globalThis.window as any)?.heliosEvt;
+    (globalThis.window as any).heliosEvt=reportEvent;
+
+    if(typeof heliosFn === 'function' && Array.isArray(heliosFn._)){
+        try{
+            for(const args of heliosFn._){
+                (reportEvent as any)(...(args as any[]));
+            }
+        }catch(ex){
+            console.log('Invalid args passed to heliosEvt global function',ex);
+        }
+    }
+}
+
+/**
+ * First checks the current URL params for any UTM params then checks in session storage for any
+ * previously stored UTM params
+ */
+export const loadUtmParams=()=>{
+
+    const url=globalThis.window?.location?.href;
+    if(url){
+        const matches=[...url.matchAll(/\butm[_-]?(campaign|source|medium|content|term)=(.*?)(?=&|$)/g)];
+        if(matches.length){
+            const campaign=matches.find(m=>m[1]==='campaign')?.[1];
+            const source=matches.find(m=>m[1]==='source')?.[1];
+            const medium=matches.find(m=>m[1]==='medium')?.[1];
+            const content=matches.find(m=>m[1]==='content')?.[1];
+            const term=matches.find(m=>m[1]==='term')?.[1];
+            const _utmParams:UtmParams={
+                utmCampaign:campaign?decodeURIComponent(campaign):undefined,
+                utmSource:source?decodeURIComponent(source):undefined,
+                utmMedium:medium?decodeURIComponent(medium):undefined,
+                utmContent:content?decodeURIComponent(content):undefined,
+                utmTerm:term?decodeURIComponent(term):undefined,
+            }
+            setUtmParams(_utmParams);
+            return;
+        }
+    }
+
+
+    const _utmParams=getStoreValue<UtmParams>(utmParamsKey,true);
+    if(_utmParams){
+        utmParams=_utmParams;
+    }
+
+}
+
+export const setUtmParams=(params:UtmParams|undefined):UtmParams|undefined=>{
+    if(params){
+        setStoreValue(utmParamsKey,params,true);
+        utmParams={...params};
+    }else{
+        deleteStoreValue(utmParamsKey,true);
+        utmParams=undefined;
+    }
+    return params;
+}
+
+export const getUtmParams=():UtmParams|undefined=>{
+    return utmParams?{...utmParams}:undefined;
+}
+
+/**
+ * Used to generate unique Ids client side
+ */
+export const generateUid=()=>{
+    const baseId=shortUuid();
+    const suffix=shortUuid();
+    const max=suffix.length-1;
+    return (
+        baseId+
+        suffix[Math.floor(Math.random()*max)]+
+        suffix[Math.floor(Math.random()*max)]+
+        suffix[Math.floor(Math.random()*max)]
+    )
+}
+
+export const getHeliosClientSessionId=():string=>{
+    return getOrSetStoreString('sessionId',generateUid,true);
+}
+
+export const getHeliosClientDeviceId=():string=>{
+    return getOrSetStoreString('deviceId',generateUid,false);
+}
+
+const storeCache:Record<string,string>={}
+const getStoreString=(key:string,session=false):string|undefined=>{
+    key=requireConfig().storagePrefix+key;
+    let value:string|undefined=storeCache[(session?'s':'l')+key];
+    if(value!==undefined){
+        return value;
+    }
+    value=(session?globalThis.sessionStorage?.getItem(key):globalThis.localStorage?.getItem(key))??undefined;
+    if(value!==undefined){
+        storeCache[(session?'s':'l')+key]=value;
+    }
+    return value;
+}
+
+const getOrSetStoreString=(key:string,defaultValue:string|(()=>string),session=false):string=>{
+    const value=getStoreString(key,session);
+    if(value===undefined){
+        return setStoreString(key,typeof defaultValue === 'function'?defaultValue():defaultValue,session);
+    }else{
+        return value;
+    }
+}
+
+const setStoreString=(key:string,value:string,session=false):string=>{
+    key=requireConfig().storagePrefix+key;
+    storeCache[(session?'s':'l')+key]=value;
+    if(session){
+        globalThis.sessionStorage?.setItem(key,value);
+    }else{
+        globalThis.localStorage?.setItem(key,value);
+    }
+    return value;
+}
+const getStoreValue=<T>(key:string,session=false):T|undefined=>{
+    const json=getStoreString(key,session);
+    if(json===undefined){
+        return undefined;
+    }
+    return JSON.parse(json);
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getOrSetStoreValue=<T>(key:string,defaultValue:(()=>T)|T,session=false):T=>{
+    const json=getStoreString(key,session);
+    if(json===undefined){
+        const value=typeof defaultValue === 'function'?(defaultValue as (()=>T))():defaultValue;
+        setStoreString(key,JSON.stringify(value),session);
+        return value;
+    }
+    return JSON.parse(json);
+}
+
+const setStoreValue=<T>(key:string,value:T,session=false):T=>{
+    setStoreString(key,JSON.stringify(value),session);
+    return value;
+}
+
+const deleteStoreValue=(key:string,session=false)=>{
+    key=requireConfig().storagePrefix+key;
+    (session?globalThis.sessionStorage:globalThis.localStorage)?.removeItem(key);
 }
 
 /**
@@ -260,7 +429,7 @@ export const isActiveTargetMatch=(elem:Element|EventTarget|null|undefined,eventT
     return false;
 }
 
-const addElementPropsToEvent=(elem:Element,event:WithoutId<EventRecord>)=>{
+const addElementPropsToEvent=(elem:Element,event:OptionalEventRecord)=>{
     event.elem=elem.tagName?.toLowerCase();
     if(elem.classList.length){
         event.classList=[];
@@ -274,20 +443,36 @@ const addElementPropsToEvent=(elem:Element,event:WithoutId<EventRecord>)=>{
 }
 
 
+interface EventPromisePair
+{
+    evt:OptionalEventRecord;
+    promiseSource:PromiseSource<OptionalEventRecord>;
+}
+
 export interface TrackEventOverloads
 {
-    (event:WithoutId<EventRecord>|WithoutId<EventRecord>[]):void;
+    (event:OptionalEventRecord|OptionalEventRecord[],reportedPromise?:PromiseSource<OptionalEventRecord>):void;
     (eventType:string,tag?:string|string[]|null,elem?:Element|null):void;
 }
+
+
+const eventPromisePairs:EventPromisePair[]=[];
 
 /**
  * Reports an event to the API. Active event targets are no taken into consideration.
  */
 export const reportEvent:TrackEventOverloads=(
-    eventOrEventType:WithoutId<EventRecord>|WithoutId<EventRecord>[]|string,
-    tag?:string|string[]|null,
+    eventOrEventType:OptionalEventRecord|OptionalEventRecord[]|string,
+    tag?:string|string[]|null|PromiseSource<OptionalEventRecord>,
     elem?:Element|null
 )=>{
+    let promiseSource:PromiseSource<OptionalEventRecord>|undefined;
+    if(typeof tag==='object' && !Array.isArray(tag)){
+        if(tag){
+            promiseSource=tag;
+        }
+        tag=null;
+    }
     if(typeof eventOrEventType === 'string'){
         eventOrEventType={
             type:eventOrEventType,
@@ -300,7 +485,7 @@ export const reportEvent:TrackEventOverloads=(
             addElementPropsToEvent(elem,eventOrEventType);
         }
     }
-    const queueEvt=(event:WithoutId<EventRecord>)=>{
+    const queueEvt=(event:OptionalEventRecord)=>{
         const config=requireConfig();
         if(config?.populateHost && !event.host && config.host){
             event.host=config.host;
@@ -308,7 +493,30 @@ export const reportEvent:TrackEventOverloads=(
         if(config.populatePath && !event.path){
             event.path=getCurrentPath();
         }
-        sendQueue.push(config.transformEvent(event));
+        if(utmParams){
+            for(const e in utmParams){
+                if((utmParams as any)[e] && !((event as any)[e])){
+                    (event as any)[e]=(utmParams as any)[e];
+                }
+            }
+        }
+        if(!event.cdi){
+            event.cdi=getHeliosClientDeviceId();
+        }
+        if(!event.sid){
+            event.sid=getHeliosClientSessionId();
+        }
+        if(event.time===undefined){
+            event.time=Date.now();
+        }
+        const transformed=config.transformEvent(event);
+        if(promiseSource){
+            eventPromisePairs.push({
+                evt:event,
+                promiseSource,
+            })
+        }
+        sendQueue.push(transformed);
         if(config.logEvents){
             console.log(config.logPrefix,event,ignoreConsoleListeners);
         }
@@ -320,19 +528,62 @@ export const reportEvent:TrackEventOverloads=(
     }else{
         queueEvt(eventOrEventType);
     }
-    sendQueuedEvents();
+    sendQueuedEvents(promiseSource?true:false);
 }
 
-let sendQueue:WithoutId<EventRecord>[]=[];
+/**
+ * Alias of reportEvent that can be used for compatibility with vanilla javascript.
+ */
+export const heliosEvt=reportEvent;
+
+
+export const getHeliosClientLocationInfoAsync=async ():Promise<LocationInfo|undefined>=>{
+    return (await lookupHeliosClientAsync())?.location;
+}
+
+let _lookup:ProfileLookup|undefined=undefined;
+let lookupPromise:Promise<ProfileLookup|undefined>|undefined=undefined;
+export const lookupHeliosClientAsync=async ():Promise<ProfileLookup|undefined>=>{
+    const info=getStoreValue<ProfileLookup>(profileLookupKey,true);
+    if(info){
+        return info;
+    }
+    return await (lookupPromise??(lookupPromise=_lookupProfile()))
+}
+
+const _lookupProfile=async ():Promise<ProfileLookup|undefined>=>{
+    const request:ProfileResolveRequest={
+        deviceUuid:getHeliosClientDeviceId(),
+        autoCreateProfile:true,
+    }
+    try{
+        const query=queryParamsToObject(globalThis?.location?.search);
+        if(query[eventProxyUrlParam]){
+            const evtData:EventUrlProxyRequest=JSON.parse(query[eventProxyUrlParam]);
+            if(evtData?.profileUuid){
+                request.profileUuid=evtData.profileUuid;
+            }
+        }
+    }catch{}
+    const info=await sendAsync<ProfileLookup>(requireConfig(),'/profile/resolve?'+objectToQueryParams(request),'GET');
+    _lookup=(info??{})
+    setStoreValue(profileLookupKey,true);
+    return _lookup;
+}
+
+let sendQueue:OptionalEventRecord[]=[];
 let isSending=false;
-const sendQueuedEvents=()=>{
+const sendQueuedEvents=(noDelay?:boolean)=>{
     if(isSending || !sendQueue.length){
         return;
     }
     isSending=true;
     (async ()=>{
         try{
-            await delayAsync(requireConfig().sendDelayMs);
+            await delayAsync(noDelay?1:requireConfig().sendDelayMs);
+            if(!_lookup){
+                await lookupHeliosClientAsync();
+            }
             while(sendQueue.length){
                 await flushSendQueueAsync();
             }
@@ -354,11 +605,50 @@ export const flushSendQueueAsync=async ()=>{
     }
     sendQueue=[];
 
+    if(_lookup?.profile?.pStat===ProfileStatus.disabled){// profile is disabled
+        return;
+    }
+
+    if(_lookup){
+        const loc=_lookup.location;
+        const pro=_lookup.profile;
+        for(const evt of queue){
+            if(loc){
+                for(const e in loc){
+                    if((loc as any)[e] && !(evt as any)[e]){
+                        (evt as any)[e]=(loc as any)[e];
+                    }
+                }
+            }
+            if(pro && evt.profileId===undefined){
+                evt.profileId=pro.id;
+            }
+
+        }
+    }
+
+
     if(getConfig()?.minifyEvents){
         minifyEventRecords(queue);
     }
 
-    await sendAsync(requireConfig(),'/events','POST',queue,true);
+    try{
+        await sendAsync(requireConfig(),'/events','POST',queue,true);
+    }finally{
+        for(const e of queue){
+            for(let i=0;i<eventPromisePairs.length;i++){
+                const p=eventPromisePairs[i];
+                if(!p){
+                    continue;
+                }
+                eventPromisePairs.splice(i,1);
+                i--;
+                if(p.evt===e){
+                    p.promiseSource.resolve(e);
+                }
+            }
+        }
+    }
 }
 
 
@@ -378,4 +668,104 @@ export const getCurrentPath=():string=>{
         return '/';
     }
     return parsePath(globalThis.window?.location?.toString(),getConfig()??defaultHeliosClientConfig);
+}
+
+const signInTokenKey='helios-client-sign-in-token';
+let signInToken:ClientSignInToken|null|undefined=undefined;
+const getToken=()=>{
+    if(signInToken && isExpired(signInToken)){
+        signInToken=undefined;
+    }
+    if(signInToken!==undefined){
+        return signInToken;
+    }
+    const t=globalThis.localStorage?.getItem(signInTokenKey);
+    if(t){
+        const parsed:ClientSignInToken=JSON.parse(t);
+        if(isExpired(parsed)){
+            signInToken=null;
+            globalThis.localStorage?.removeItem(signInTokenKey);
+        }else{
+            signInToken=parsed;
+        }
+    }else{
+        signInToken=null;
+    }
+    return signInToken;
+}
+
+export const tryAutoSignInHeliosClient=():boolean=>{
+    if(signInToken){
+        return true;
+    }
+    return getToken()?true:false;
+}
+
+export const isHeliosClientSignedIn=()=>{
+    return getToken()?true:false;
+}
+
+export const signInHeliosClient=async (username:string,password:string):Promise<string>=>{
+    const token=await sendAsync<string>(requireConfig(),'/sign-in','POST',{
+        username,
+        password,
+    });
+    if(!token){
+        throw new Error('Sign-in failed');
+    }
+    signInToken={
+        token,
+        expires:Date.now()+1000*60*120
+    }
+    globalThis.localStorage?.setItem(signInTokenKey,JSON.stringify(signInToken))
+    return token;
+}
+
+const isExpired=(token:ClientSignInToken|null|undefined)=>{
+    if(!token){
+        return true;
+    }
+    return token.expires<Date.now();
+}
+
+export const heliosHttpGetAsync=<TResult=any>(
+    endpoint:string,
+):Promise<TResult|undefined>=>{
+    return sendAsync(requireConfig(),endpoint,'GET',undefined,false,getToken()?.token);
+}
+
+export const heliosHttpPostAsync=<TResult=any,TBody=any>(
+    endpoint:string,
+    body:TBody
+):Promise<TResult|undefined>=>{
+    return sendAsync(requireConfig(),endpoint,'POST',body,false,getToken()?.token);
+}
+
+export const heliosHttpDeleteAsync=<TResult=any>(
+    endpoint:string
+):Promise<TResult|undefined>=>{
+    return sendAsync(requireConfig(),endpoint,'DELETE',undefined,false,getToken()?.token);
+}
+
+export const setFormOpenTime=(uuid:string,time=Date.now())=>{
+    const key=requireConfig().storagePrefix+'form-open-'+uuid;
+    globalThis.localStorage?.setItem(key,time.toString());
+}
+
+export const getFormOpenTime=(uuid:string):number|undefined=>{
+    const key=requireConfig().storagePrefix+'form-open-'+uuid;
+    const time=globalThis.localStorage?.getItem(key);
+    return time?Number(time):undefined;
+}
+
+
+export const setFormCloseTime=(uuid:string,time=Date.now())=>{
+    const key=requireConfig().storagePrefix+'form-close-'+uuid;
+    globalThis.localStorage?.setItem(key,time.toString());
+}
+
+export const getFormCloseTime=(uuid:string):number|undefined=>{
+    const key=requireConfig().storagePrefix+'form-close-'+uuid;
+    const time=globalThis.localStorage?.getItem(key);
+    return time?Number(time):undefined;
 }

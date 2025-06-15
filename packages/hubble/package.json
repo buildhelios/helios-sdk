@@ -1,6 +1,6 @@
 {
     "name": "@buildhelios/hubble",
-    "version": "0.0.7",
+    "version": "1.0.1",
     "type": "commonjs",
     "main":"src/lib/hubble.ts",
     "repository":{

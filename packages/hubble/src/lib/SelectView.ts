@@ -1,8 +1,8 @@
 import { Button } from "./Button";
 import { ElemOverlay } from "./ElemOverlay";
 import { Head } from "./Head";
-import { Hubble } from "./Hubble";
 import { UiView } from "./UiView";
+import { Hubble } from "./hubble";
 import { colStyle } from "./hubble-style";
 import { createHubbleTarget } from "./hubble-types";
 

@@ -1,6 +1,6 @@
 {
     "name": "@buildhelios/common",
-    "version": "0.0.7",
+    "version": "1.0.1",
     "type": "commonjs",
     "repository":{
         "type":"git",

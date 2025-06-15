@@ -12,7 +12,20 @@
                 "main": "packages/hubble/src/index.ts",
                 "tsConfig": "packages/hubble/tsconfig.lib.json",
                 "assets": ["packages/hubble/*.md"],
-                "enableAmd": false
+                "enableAmd": false,
+                "esbuildTargets":[
+                    {
+                        "srcDir":"packages/hubble/src/targets",
+                        "outDir":"dist/packages/hubble/targets",
+                        "options":{
+                            "bundle":true,
+                            "target":"ES2022",
+                            "minify":false,
+                            "sourcemap":"external",
+                            "external":["sharp"]
+                        }
+                    }
+                ]
             }
         },
         "build-standalone": {

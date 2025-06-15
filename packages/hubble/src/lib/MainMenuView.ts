@@ -1,8 +1,8 @@
 import { Head } from "./Head";
-import { Hubble } from "./Hubble";
 import { PanelButton } from "./PanelButton";
 import { ScrollView } from "./ScrollView";
 import { UiView } from "./UiView";
+import { Hubble } from "./hubble";
 import { hsComps } from "./hubble-comps";
 import { colStyle, hs } from "./hubble-style";
 
@@ -50,5 +50,14 @@ export class MainMenuView extends UiView
                 })
             ]
         })
+
+        let first=true;
+        this.disposables.addSub(hubble.targetsSubject.subscribe(()=>{
+            if(first){
+                first=false;
+                return;
+            }
+            hubble.menu.refresh();
+        }))
     }
 }

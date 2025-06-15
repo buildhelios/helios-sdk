@@ -1,9 +1,10 @@
-import { Hubble } from "./Hubble";
+import { tryAutoSignInHeliosClient } from "@buildhelios/client";
 import { MainMenuView } from "./MainMenuView";
 import { SelectView } from "./SelectView";
 import { SignInView } from "./SignInView";
 import { TargetView } from "./TargetView";
 import { UiView } from "./UiView";
+import { Hubble } from "./hubble";
 import { hs } from "./hubble-style";
 import { HubblePos, HubbleTarget } from "./hubble-types";
 
@@ -26,7 +27,7 @@ export class HubbleMenu extends UiView
 
     private modeView:UiView|null=null;
 
-    private _mode:HubbleModeState={type:'sign-in'};
+    private _mode:HubbleModeState;
     public get mode(){return this._mode}
     public set mode(value:HubbleModeState){
         if(value===this._mode){
@@ -76,6 +77,8 @@ export class HubbleMenu extends UiView
             },
         })
 
+        this._mode={type:tryAutoSignInHeliosClient()?'main-menu':'sign-in'}
+
         this.hubble=hubble;
 
         this.updateMode();
@@ -110,5 +113,10 @@ export class HubbleMenu extends UiView
         if(this.modeView){
             this.addChild(this.modeView);
         }
+    }
+
+    public refresh()
+    {
+        this.updateMode();
     }
 }

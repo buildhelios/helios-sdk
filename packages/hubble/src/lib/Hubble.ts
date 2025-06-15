@@ -1,7 +1,11 @@
-import { loadHubbleTargets, storeKey } from "./hubble-lib";
+import { isHeliosClientSignedIn } from "@buildhelios/client";
+import { ReadonlySubject } from "@iyio/common";
+import { BehaviorSubject } from "rxjs";
+import { HubbleMenu } from "./HubbleMenu";
+import { loadLocalHubbleTargets, saveLocalHubbleTargets } from "./hubble-local-store";
+import { deleteRemoteHubbleTargetAsync, loadRemoteHubbleTargetsAsync, putRemoteHubbleTargetAsync } from "./hubble-remote-store";
 import { insertHubbleStyleSheet } from "./hubble-style-sheet";
 import { HubbleTarget } from "./hubble-types";
-import { HubbleMenu } from "./HubbleMenu";
 
 
 export class Hubble{
@@ -11,12 +15,15 @@ export class Hubble{
 
     public currentTarget:HubbleTarget|null=null;
 
-    public targets:HubbleTarget[]=[];
+    private readonly _targets:BehaviorSubject<HubbleTarget[]>=new BehaviorSubject<HubbleTarget[]>([]);
+    public get targetsSubject():ReadonlySubject<HubbleTarget[]>{return this._targets}
+    public get targets(){return this._targets.value}
+
 
 
     public constructor()
     {
-        this.loadTargets();
+        this.loadTargetsAsync();
 
         this.menu=new HubbleMenu(this);
     }
@@ -25,7 +32,7 @@ export class Hubble{
     {
 
         insertHubbleStyleSheet();
-        window.addEventListener('keyup',this.onKey);
+        window.addEventListener('keyup',this.onKey,true);
 
         if(location.search?.includes('__hubble_action__=open')){
             this.menu.open=true;
@@ -35,11 +42,11 @@ export class Hubble{
     public dispose()
     {
         this.menu.dispose();
-        window.removeEventListener('keyup',this.onKey);
+        window.removeEventListener('keyup',this.onKey,true);
     }
 
     private readonly onKey=(e:KeyboardEvent)=>{
-        if(e.ctrlKey && e.shiftKey && e.altKey && e.key==='1'){
+        if(e.ctrlKey && e.shiftKey && e.altKey && (e.key==='1' || e.key==='!')){
             e.preventDefault();
             e.stopPropagation();
 
@@ -47,32 +54,47 @@ export class Hubble{
         }
     }
 
-    public saveTarget(target:HubbleTarget)
+    public async saveTargetAsync(target:HubbleTarget)
     {
-        const matchIndex=this.targets.findIndex(t=>t.id===target.id);
+        const targets=[...this._targets.value];
+        const matchIndex=targets.findIndex(t=>t.id===target.id);
         if(matchIndex===-1){
-            this.targets.push(target);
+            targets.push(target);
         }else{
-            this.targets[matchIndex]=target;
+            targets[matchIndex]=target;
         }
+        this._targets.next(targets);
 
-        localStorage.setItem(storeKey,JSON.stringify(this.targets))
+        if(isHeliosClientSignedIn()){
+            await putRemoteHubbleTargetAsync(target);
+        }else{
+            saveLocalHubbleTargets(targets);
+        }
     }
 
-    public deleteTarget(id:string){
+    public async deleteTargetAsync(id:string){
         const matchIndex=this.targets.findIndex(t=>t.id===id);
         if(matchIndex===-1){
             return;
         }
 
-        this.targets.splice(matchIndex,1);
+        const targets=[...this._targets.value];
+        targets.splice(matchIndex,1);
+        this._targets.next(targets);
 
-        localStorage.setItem(storeKey,JSON.stringify(this.targets))
+        if(isHeliosClientSignedIn()){
+            await deleteRemoteHubbleTargetAsync(id);
+        }else{
+            saveLocalHubbleTargets(targets);
+        }
     }
 
-    public loadTargets()
+    public async loadTargetsAsync()
     {
-        this.targets=loadHubbleTargets();
+        this._targets.next(isHeliosClientSignedIn()?
+            await loadRemoteHubbleTargetsAsync():
+            loadLocalHubbleTargets()
+        );
     }
 
 }

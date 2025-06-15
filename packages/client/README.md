@@ -27,22 +27,29 @@ npm i @buildhelios/client
 Install using vanilla JavaScript
 ``` html
 <script>
-(function(w,d,init){
-    if(w.hubble){
+(function(w,u,init){
+    if(w.heliosEvt){
         return;
     }
-    w.hubble=function(){w.hubble._.push(arguments)};
-    w.hubble._=[];
-    w.hubble._init=init;
+    var h=function(){h._.push(arguments)};
+    h._=[];
+    h._i_=init;
+    h._u=u;
+    h._config={
+        /* custom HeliosClientConfig values here */
+    }
+    w.heliosEvt=h;
+    var d=w.document;
     var s=d.createElement('script');
-    s.src='https://cdn.buildhelios.com/client.js';
+    s.async=1;
+    s.src=u+'client-sdk/core/client.js';
     d.head.append(s);
-})(window,document);
+})(window,'https://YOUR_WORKSPACE.gardeniq.app/');
 </script>
 
 <!-- Minified -->
 <script>
-(function(w,d,i){if(!w.hubble){w.hubble=function(){w.hubble._.push(arguments)};w.hubble._=[];w.hubble._init=i;;var s=d.createElement('script');s.src='https://cdn.buildhelios.com/client.js';d.head.append(s);}})(window,document);
+(function(w,u,init){if(w.heliosEvt)return;var h=function(){h._.push(arguments)};h._=[];h._i_=init;h._u=u;w.heliosEvt=h;var d=w.document;var s=d.createElement('script');s.async=1;s.src=u+'client-sdk/core/client.js';d.head.append(s);})(window,'https://YOUR_WORKSPACE.gardeniq.app/');
 </script>
 
 ```
@@ -50,7 +57,7 @@ Install using vanilla JavaScript
 <br/>
 <br/>
 
-## Usage
+## NPM Usage
 
 ``` typescript
 import { initHeliosClient, addEventTarget, addListener, reportEvent } from "@buildhelios/client"
@@ -111,13 +118,38 @@ addEventTarget([
 // target or listener is not required.
 reportEvent({
     type:'some-custom-event-type',
-    time:Date.now(),
     data:{
         weight:50,
         color:'green',
     }
 })
 
+// Report an event by type and and no data
+reportEvent('event-type')
+
+report
+
+```
+
+<br/>
+<br/>
+
+## Vanilla Javascript Usage
+With vanilla javascript the global function `heliosEvt` is used to report events
+
+``` js
+// Report a custom event. Calling heliosEvt will queue the event to be send to the API, a matching
+// target or listener is not required.
+heliosEvt({
+    type:'some-custom-event-type',
+    data:{
+        weight:50,
+        color:'green',
+    }
+})
+
+// Report an event by type and and no data
+heliosEvt('event-type')
 ```
 
 <br/>
@@ -224,7 +256,7 @@ export interface HeliosClientConfig
     /**
      * Can be used to modify events before they are sent to the API.
      */
-    transformEvent?:(event:WithoutId<EventRecord>)=>WithoutId<EventRecord>;
+    transformEvent?:(event:OptionalEventRecord)=>OptionalEventRecord;
 
     /**
      * If true mouse, touch and scroll position will be captured.
@@ -302,6 +334,39 @@ export interface HeliosClientConfig
      * @default 'reportEvent'
      */
     logPrefix?:string;
+
+    /**
+     * A prefix given to all values stored in local and session storage
+     * @default "heliosClient/"
+     */
+    storagePrefix?:string;
+
+    /**
+     * A prefix given to custom component
+     * @default "helios-"
+     */
+    customComponentPrefix?:string;
+
+    /**
+     * Array of forms to display based on rules and conditions
+     */
+    forms?:FormRecord[];
+
+    /**
+     * If true forms should not be displayed based on rules.
+     */
+    disableFormRules?:boolean;
+
+    /**
+     * If true the window should be closed after a form is submitted
+     */
+    closeWindowOnFormSubmit?:boolean;
+
+    /**
+     * If true forms will not be submitted to the submission endpoint and will be logged to the console.
+     * This is helpful for debugging.
+     */
+    disableFormSubmit?:boolean;
 
 }
 ```
@@ -467,4 +532,9 @@ export interface EventRecords
      */
     sy?:number;
 }
+
+/**
+ * An event record without an id and all properties other than type optional.
+ */
+export type OptionalEventRecord=Omit<EventRecord,'id'|'time'> & {time?:number};
 ```

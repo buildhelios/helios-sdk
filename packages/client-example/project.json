@@ -4,7 +4,7 @@
     "sourceRoot": "packages/client-example",
     "projectType": "application",
     "targets": {
-        "pre-build": {
+        "build": {
             "executor": "@nrwl/next:build",
             "outputs": [
                 "{options.outputPath}"
@@ -25,38 +25,19 @@
             "executor": "@nrwl/next:server",
             "defaultConfiguration": "development",
             "options": {
-                "buildTarget": "client-example:pre-build",
+                "buildTarget": "client-example:build",
                 "dev": true,
                 "port": 4217
             },
             "configurations": {
                 "development": {
-                    "buildTarget": "client-example:pre-build:development",
+                    "buildTarget": "client-example:build:development",
                     "dev": true
                 },
                 "production": {
-                    "buildTarget": "client-example:pre-build:production",
+                    "buildTarget": "client-example:build:production",
                     "dev": false
                 }
-            }
-        },
-        "export": {
-            "executor": "@nrwl/next:export",
-            "options": {
-                "buildTarget": "client-example:pre-build:production"
-            }
-        },
-        "build": {
-            "dependsOn": [
-                {
-                    "target": "export",
-                    "projects": "self"
-                }
-            ],
-            "executor": "nx:run-commands",
-            "options": {
-                "cwd": "packages/client-example",
-                "command": "echo 'todo - ./build-serverless.sh'"
             }
         },
         "test": {

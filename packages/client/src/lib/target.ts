@@ -111,8 +111,8 @@ const _isTargetMatch=(
     if(match && target.match!==undefined){
         match=false;
         const textContent=elem.textContent?.trim()??'';
-        if(Array.isArray(target.contains)){
-            for(const c of target.contains){
+        if(Array.isArray(target.match)){
+            for(const c of target.match){
                 if(textContent===c){
                     match=true;
                     break;

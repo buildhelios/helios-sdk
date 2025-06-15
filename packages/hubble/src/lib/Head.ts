@@ -1,5 +1,5 @@
-import { Hubble } from "./Hubble";
 import { UiView, UiViewChild } from "./UiView";
+import { Hubble } from "./hubble";
 import { icons } from "./hubble-icons";
 import { h1Style, hs } from "./hubble-style";
 import { HubblePos } from "./hubble-types";

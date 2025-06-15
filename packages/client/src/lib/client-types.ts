@@ -1,5 +1,6 @@
-import { LogLevel, WithoutId } from "@buildhelios/common";
-import { EventRecord } from "@buildhelios/types";
+import { LogLevel } from "@buildhelios/common";
+import { EventRecord, FormRecord } from "@buildhelios/types";
+import { defaultCustomComponentPrefix } from "./client-const";
 
 export interface UiEventTarget
 {
@@ -137,7 +138,7 @@ export interface HeliosClientConfig
     /**
      * Can be used to modify events before they are sent to the API.
      */
-    transformEvent?:(event:WithoutId<EventRecord>)=>WithoutId<EventRecord>;
+    transformEvent?:(event:OptionalEventRecord)=>OptionalEventRecord;
 
     /**
      * If true mouse, touch and scroll position will be captured.
@@ -216,13 +217,86 @@ export interface HeliosClientConfig
      */
     logPrefix?:string;
 
+    /**
+     * A prefix given to all values stored in local and session storage
+     * @default "heliosClient/"
+     */
+    storagePrefix?:string;
+
+    /**
+     * A prefix given to custom component
+     * @default "helios-"
+     */
+    customComponentPrefix?:string;
+
+    /**
+     * Array of forms to display based on rules and conditions
+     */
+    forms?:FormRecord[];
+
+    /**
+     * Path to the sdk service worker.
+     * @default "/scripts/helios-service-worker.js"
+     */
+    serviceWorkerPath?:string;
+
+    /**
+     * If true forms should not be displayed based on rules.
+     */
+    disableFormRules?:boolean;
+
+    /**
+     * If true the window should be closed after a form is submitted
+     */
+    closeWindowOnFormSubmit?:boolean;
+
+    /**
+     * If true forms will not be submitted to the submission endpoint and will be logged to the console.
+     * This is helpful for debugging.
+     */
+    disableFormSubmit?:boolean;
+
+}
+
+export interface ClientSignInToken
+{
+    token:string;
+    expires:number;
 }
 
 export const allLogTypes=['debug','info','log','warn','error'];
 Object.freeze(allLogTypes);
 export type LogType=typeof allLogTypes[number];
 
+export interface HeliosEvtFn
+{
+    /**
+     * Adds events
+     */
+    (...args:any[]):void;
 
+    /**
+     * Temporary store for events
+     */
+    _:any[];
+
+    /**
+     * workspace URL
+     */
+    _u:string;
+
+    /**
+     * Optional init function
+     */
+    _i?:()=>void;
+
+    _config?:HeliosClientConfig;
+}
+
+/**
+ * An event record without an id and all properties other than type optional.
+ */
+export type OptionalEventRecord=Omit<EventRecord,'id'|'time'> & {time?:number};
 
 export const defaultHeliosClientConfig:Required<HeliosClientConfig>={
     apiBaseUrl:'/api/',
@@ -258,6 +332,13 @@ export const defaultHeliosClientConfig:Required<HeliosClientConfig>={
         'touchend',
     ],
     captureScrollPosition:false,
+    storagePrefix:'heliosClient/',
+    customComponentPrefix:defaultCustomComponentPrefix,
+    forms:[],
+    serviceWorkerPath:'/scripts/helios-service-worker.js',
+    disableFormRules:false,
+    closeWindowOnFormSubmit:false,
+    disableFormSubmit:false,
 }
 Object.freeze(defaultHeliosClientConfig.listenTo);
 Object.freeze(defaultHeliosClientConfig);

@@ -1,6 +1,13 @@
+export * from './lib/RemoteComp';
 export * from './lib/client';
+export * from './lib/client-const';
 export * from './lib/client-lib';
 export * from './lib/client-types';
+export * from './lib/comp-reg';
+export * from './lib/forms/FormComp';
+export * from './lib/forms/FormCtrl';
+export * from './lib/forms/FormMgr';
+export * from './lib/forms/form-ctrl-lib';
+export * from './lib/forms/forms-lib';
 export * from './lib/minify';
 export * from './lib/target';
-

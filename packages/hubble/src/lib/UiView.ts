@@ -1,4 +1,4 @@
-import { aryRemoveItem, asArray, HashMap } from "@iyio/common";
+import { aryRemoveItem, asArray, DisposeContainer, HashMap } from "@iyio/common";
 import type { CSSProperties } from 'react';
 import { nodeListToAry } from "./content-utils";
 import { hs } from "./hubble-style";
@@ -256,6 +256,7 @@ export class UiView<T extends HTMLElement=HTMLElement>
 
     }
 
+    protected disposables=new DisposeContainer();
     private _isDisposed=false;
     public get isDisposed(){return this._isDisposed}
     public dispose()
@@ -264,6 +265,8 @@ export class UiView<T extends HTMLElement=HTMLElement>
             return;
         }
         this._isDisposed=true;
+
+        this.disposables.dispose();
 
         for(const child of this.children){
             child.dispose();

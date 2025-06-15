@@ -19,65 +19,104 @@
         "skipDefaultLibCheck": true,
         "baseUrl": ".",
         "paths": {
-            "@buildhelios/proto-nodes": [
-                "packages/proto-nodes/src/index.ts"
-            ],
-            "@buildhelios/types": [
-                "packages/types/src/index.ts"
-            ],
-            "@buildhelios/domain-functions": [
-                "packages/domain-functions/src/index.ts"
-            ],
-            "@buildhelios/tables": [
-                "packages/tables/src/index.ts"
-            ],
-            "@buildhelios/components": [
-                "packages/components/src/index.ts"
-            ],
-            "@buildhelios/hubble": [
-                "packages/hubble/src/index.ts"
-            ],
-            "@buildhelios/fns": [
-                "packages/fns/src/index.ts"
-            ],
-            "@buildhelios/fn-clients": [
-                "packages/fn-clients/src/index.ts"
-            ],
-            "@buildhelios/params": [
-                "packages/params/src/index.ts"
-            ],
-            "@buildhelios/frontend": [
-                "packages/frontend/src/index.ts"
-            ],
             "@buildhelios/backend": [
                 "packages/backend/src/index.ts"
             ],
             "@buildhelios/callables": [
                 "packages/callables/src/index.ts"
             ],
-            "@buildhelios/domain-actions": [
-                "packages/domain-actions/src/index.ts"
-            ],
             "@buildhelios/client": [
                 "packages/client/src/index.ts"
-            ],
-            "@buildhelios/event-handler": [
-                "packages/event-handler/src/index.ts"
-            ],
-            "@buildhelios/sql-tables": [
-                "packages/sql-tables/src/index.ts"
-            ],
-            "@buildhelios/sql-migrations": [
-                "packages/sql-migrations/src/index.ts"
             ],
             "@buildhelios/common": [
                 "packages/common/src/index.ts"
             ],
+            "@buildhelios/components": [
+                "packages/components/src/index.ts"
+            ],
+            "@buildhelios/domain": [
+                "packages/domain/src/index.ts"
+            ],
+            "@buildhelios/domain-actions": [
+                "packages/domain-actions/src/index.ts"
+            ],
+            "@buildhelios/domain-functions": [
+                "packages/domain-functions/src/index.ts"
+            ],
+            "@buildhelios/event-handler": [
+                "packages/event-handler/src/index.ts"
+            ],
+            "@buildhelios/fn-clients": [
+                "packages/fn-clients/src/index.ts"
+            ],
+            "@buildhelios/fns": [
+                "packages/fns/src/index.ts"
+            ],
+            "@buildhelios/frontend": [
+                "packages/frontend/src/index.ts"
+            ],
+            "@buildhelios/hubble": [
+                "packages/hubble/src/index.ts"
+            ],
+            "@buildhelios/params": [
+                "packages/params/src/index.ts"
+            ],
+            "@buildhelios/proto-nodes": [
+                "packages/proto-nodes/src/index.ts"
+            ],
+            "@buildhelios/sql-migrations": [
+                "packages/sql-migrations/src/index.ts"
+            ],
+            "@buildhelios/sql-tables": [
+                "packages/sql-tables/src/index.ts"
+            ],
+            "@buildhelios/tables": [
+                "packages/tables/src/index.ts"
+            ],
+            "@buildhelios/types": [
+                "packages/types/src/index.ts"
+            ],
+            "@convo-lang/ai-complete": [
+                "packages/ai-complete/src/index.ts"
+            ],
+            "@convo-lang/ai-complete-lambda": [
+                "packages/ai-complete-lambda/src/index.ts"
+            ],
+            "@convo-lang/ai-complete-openai": [
+                "packages/ai-complete-openai/src/index.ts"
+            ],
+            "@convo-lang/ai-complete-openai-cdk": [
+                "packages/ai-complete-openai-cdk/src/index.ts"
+            ],
+            "@convo-lang/convo-lang": [
+                "packages/convo-lang/src/index.ts"
+            ],
+            "@convo-lang/convo-lang-cli": [
+                "packages/convo-lang-cli/src/index.ts"
+            ],
+            "@convo-lang/convo-lang-doc-query": [
+                "packages/convo-lang-doc-query/src/index.ts"
+            ],
+            "@convo-lang/convo-lang-openai": [
+                "packages/convo-lang-openai/src/index.ts"
+            ],
+            "@convo-lang/convo-lang-react": [
+                "packages/convo-lang-react/src/index.ts"
+            ],
+            "@heliosvs/design-tokens": [
+                "packages/design-tokens/src/index.ts"
+            ],
+            "@iyio/any-comp": [
+                "packages/any-comp/src/index.ts"
+            ],
+            "@iyio/any-comp-cli": [
+                "packages/any-comp-cli/src/index.ts"
+            ],
+            "@iyio/at-dot-css": [
+                "packages/at-dot-css/src/index.ts"
+            ],
             "@iyio/aws": [
                 "packages/aws/src/index.ts"
-            ],
-            "@iyio/aws-secrets": [
-                "packages/aws-secrets/src/index.ts"
             ],
             "@iyio/aws-credential-providers": [
                 "packages/aws-credential-providers/src/index.ts"
@@ -94,17 +133,26 @@
             "@iyio/aws-s3": [
                 "packages/aws-s3/src/index.ts"
             ],
-            "@iyio/aws-tests": [
-                "packages/aws-tests/src/index.ts"
+            "@iyio/aws-secrets": [
+                "packages/aws-secrets/src/index.ts"
             ],
-            "@iyio/browser-mocks": [
-                "packages/browser-mocks/src/index.ts"
+            "@iyio/aws-sqs": [
+                "packages/aws-sqs/src/index.ts"
             ],
             "@iyio/cdk-common": [
                 "packages/cdk-common/src/index.ts"
             ],
             "@iyio/common": [
                 "packages/iyio-common/src/index.ts"
+            ],
+            "@iyio/iyio-util-fns": [
+                "packages/iyio-util-fns/src/index.ts"
+            ],
+            "@iyio/json5": [
+                "packages/json5/src/index.ts"
+            ],
+            "@iyio/media-common": [
+                "packages/media-common/src/index.ts"
             ],
             "@iyio/nextjs-common": [
                 "packages/nextjs-common/src/index.ts"
@@ -115,17 +163,20 @@
             "@iyio/nx-common": [
                 "packages/nx-common/src/index.ts"
             ],
+            "@iyio/pdf-viewer": [
+                "packages/pdf-viewer/src/index.ts"
+            ],
             "@iyio/protogen": [
                 "packages/protogen/src/index.ts"
             ],
             "@iyio/protogen-runtime": [
                 "packages/protogen-runtime/src/index.ts"
             ],
-            "@iyio/protogen-sql": [
-                "packages/protogen-sql/src/index.ts"
-            ],
             "@iyio/react-common": [
                 "packages/react-common/src/index.ts"
+            ],
+            "@iyio/rtxt": [
+                "packages/rtxt/src/index.ts"
             ],
             "@iyio/svg-charts": [
                 "packages/svg-charts/src/index.ts"
@@ -133,40 +184,19 @@
             "@iyio/svg-charts-react": [
                 "packages/svg-charts-react/src/index.ts"
             ],
-            "@iyio/tmpl-gen": [
-                "packages/tmpl-gen/src/index.ts"
+            "@iyio/syn-taxi": [
+                "packages/syn-taxi/src/index.ts"
             ],
-            "@iyio/ai-complete": [
-                "packages/ai-complete/src/index.ts"
-            ],
-            "@iyio/ai-complete-openai": [
-                "packages/ai-complete-openai/src/index.ts"
-            ],
-            "@iyio/ai-complete-lambda": [
-                "packages/ai-complete-lambda/src/index.ts"
-            ],
-            "@iyio/ai-complete-openai-cdk": [
-                "packages/ai-complete-openai-cdk/src/index.ts"
-            ],
-            "@iyio/media-common": [
-                "packages/media-common/src/index.ts"
-            ],
-            "@iyio/obj-sync": [
-                "packages/obj-sync/src/index.ts"
-            ],
-            "@iyio/obj-sync-cdk": [
-                "packages/obj-sync-cdk/src/index.ts"
-            ],
-            "@iyio/rtxt": [
-                "packages/rtxt/src/index.ts"
-            ],
-            "@iyio/iyio-util-fns": [
-                "packages/iyio-util-fns/src/index.ts"
+            "@iyio/vfs": [
+                "packages/vfs/src/index.ts"
             ]
         }
     },
     "exclude": [
         "node_modules",
-        "tmp"
+        "tmp",
+        "dist",
+        "Documents",
+        ".nx"
     ]
 }
